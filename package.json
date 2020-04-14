@@ -9,7 +9,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@ll931217/vue-treeview": "../master",
+    "@ll931217/vue-treeview": "^0.3.0",
     "node-sass": "^4.13.0",
     "nuxt": "^2.4.3",
     "pug": "^2.0.3",

@@ -8,10 +8,10 @@
         .expand-menu
           a(@click="expand") Expand All
           a(@click="collapse") Collapse All
-        tree-view(:tree.sync="tree", :editable="true", :expanded="expanded")
+        tree-view(:tree.sync="tree", :editable="true", :expanded="expanded", :show-parent-icon="{ parentShow: true, emptyParentShow: false }")
       router-view
     .footer
-      h5 MIT Licensed | Copyright &copy; 2019 Liang-Shih Lin
+      h5 MIT Licensed | 2019 -> Present | Liang-Shih Lin
         a(href="https://github.com/ll931217/vue-treeview", target="_blank").source Source
 </template>
 
@@ -23,17 +23,15 @@ export default {
   data () {
     return {
       tree: Tree,
-      expanded: true
+      expanded: false
     }
   },
   methods: {
     collapse () {
       this.expanded = false
-      console.log('[Collapse] Expanded:', this.expanded)
     },
     expand () {
       this.expanded = true
-      console.log('[Expand] Expanded:', this.expanded)
     }
   }
 }

@@ -23,6 +23,11 @@ export default new VueRouter({
       path: '/d-ger-boxer-machenzie',
       name: 'd-ger-boxer-machenzie',
       component: Machenzie
+    },
+    {
+      path: '/templink',
+      name: 'templink',
+      component: () => import('./views/Templink.vue')
     }
   ],
   mode: 'history'
