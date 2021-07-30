@@ -1,11 +1,11 @@
 {
-  "name": "@ll931217/vue-treeview",
-  "version": "0.3.2",
+  "name": "vue-treeview-ml",
+  "version": "0.1",
   "description": "A TreeView component for Vue.js.",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ll931217/vue-treeview"
+    "url": "https://github.com/milyl/vue-treeview"
   },
   "keywords": [
     "treeview",
@@ -15,7 +15,7 @@
   ],
   "author": "Liang-Shih Lin (liangshihlin@gmail.com)",
   "homepage": "https://ll931217.github.io/vue-treeview",
-  "issues": "https://github.com/ll931217/vue-treeview/issues",
+  "issues": "https://github.com/milyl/vue-treeview/issues",
   "license": "MIT",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.28",
