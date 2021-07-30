@@ -7,11 +7,7 @@
             .modal-content
               h1 Create New Node
               form(@keyup.enter="save")
-                input(type="text", v-model="newNode.text", placeholder="Text: Google")
-                input(type="text", v-model="newNode.link.type", placeholder="Type: link")
-                template(v-show="newNode.link.type === 'router-link'")
-                  input(type="text", v-model="newNode.link.key", placeholder="Key: path or name")
-                input(type="text", v-model="newNode.link.value", placeholder="Value: https://www.google.com")
+                input(type="text", v-model="newNode.text", placeholder="Folder name")
                 .btn-group
                   button(type="button", @click="cancel").cancel Cancel
                   button(type="button", @click="save").save Save
@@ -35,17 +31,21 @@
             fa(:icon="opened", @click="createNewNode").minus-square
           template(v-else)
             fa(:icon="closed", @click="createNewNode").plus-square
-        
+
         template(v-if="link && link.value")
-          router-link(:to="{ [link.key]: link.value }", v-if="link.type === 'router-link'").value
-            fa(:icon="defaultIcon")
+          router-link(:to="{ path:'', query: {folder: link.value} }", v-if="link.type === 'router-link'").value
+            fa(:icon="defaultIcon", v-show="showParentIcon.parentShow")
             | {{ text }}
 
-          a(:href="link.value", target="_blank" v-else).value
-            fa(:icon="defaultIcon")
+          a(:href="link.value", target="_blank", v-else-if="link.type === 'link'").value
+            fa(:icon="defaultIcon", v-show="showParentIcon.parentShow")
             | {{ text }}
 
-          span(@click="editing = true", v-show="editable").edit Edit
+          .branch-actions(v-if="editable")
+            span(@click="creating = true", v-show="editable").create-btn
+                fa(icon="folder-plus")
+            span(@click="editing = true", v-show="editable").edit-btn
+                fa(icon="pen")
         template(v-else)
           span(v-if="nodes.length > 0")
             fa(:icon="defaultIcon", v-show="showParentIcon.parentShow")
@@ -69,6 +69,7 @@
           :defaultIcon="t.icon || defaultIcon",
           :editable="editable",
           :expanded.sync="expanded",
+          :draggable.sync="draggable",
           :show-parent-icon="showParentIcon"
           :key="i"
         ).node
@@ -86,6 +87,7 @@
           :defaultIcon="t.icon || defaultIcon",
           :editable="editable",
           :expanded.sync="expanded",
+          :draggable.sync="draggable",
           :show-parent-icon="showParentIcon"
           :key="i"
         ).node
@@ -147,11 +149,12 @@
       clicks: 0,
       timer: null,
       newNode: {
-        text: 'Google',
+        text: '',
         link: {
-          type: 'link',
-          key: '',
-          value: 'https://www.google.com'
+          type: 'router-link',
+          key: 'path',
+          value: '',
+          query: {}
         }
       },
       creating: false,
@@ -189,11 +192,11 @@
         this.creating = false
         this.editing = false
         this.newNode = {
-          text: 'Google',
+          text: '',
           link: {
-            type: 'link',
-            key: '',
-            value: 'https://www.google.com'
+            type: 'router-link',
+            key: 'path',
+            value: ''
           }
         }
       },
@@ -202,16 +205,24 @@
         this.$emit('nodes', this.nodes)
       },
       save () {
-        if (this.newNode.link.type === 'link')
-          delete this.newNode.link.key
-        this.nodes.push(this.newNode)
-        this.creating = false
-        this.newNode = {
-          text: 'Google',
-          type: 'link',
-          value: 'https://www.google.com'
-        }
-        this.$emit('nodes', this.nodes)
+          if(this.newNode.text.length){
+              // console.log('nodes',this)
+              const query = this.newNode.text.replace(/([a-z])([A-Z])([0-9])/g, "$1-$2").replace(/\s+/g, '-').toLowerCase();
+              this.newNode.link = {
+                  type: 'router-link',
+                  key: 'path',
+                  value: query,
+              }
+            // console.log('new node:',this.newNode)
+            this.nodes.push(this.newNode)
+            this.creating = false
+            this.newNode = {
+              text: '',
+              link: {}
+            }
+            this.$emit('nodes', this.nodes)
+
+          }
       },
       toggle () {
         this.open = !this.open
