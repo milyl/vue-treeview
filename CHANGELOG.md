@@ -1,3 +1,5 @@
+# v0.3.4
+- Emiting event 'change'
 # v0.3.0 [#15](https://github.com/ll931217/vue-treeview/pull/15)
 
 - Added `CHANGELOG.md`

@@ -21,6 +21,7 @@
 
 <script>
 import branch from './branch'
+import eventBus from './eventBus'
 
 export default {
   name: 'TreeView',
@@ -60,6 +61,11 @@ export default {
   },
   components: {
     treeview: branch
+  },
+  created () {
+      eventBus.$on('nodeChange', (val) => {
+          this.$emit('change', val)
+      })
   }
 }
 </script>

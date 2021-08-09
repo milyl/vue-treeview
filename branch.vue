@@ -33,7 +33,7 @@
             fa(:icon="closed", @click="createNewNode").plus-square
 
         template(v-if="link && link.value")
-          router-link(:to="{ path:'', query: {folder: link.value} }", v-if="link.type === 'router-link'").value
+          a(@click="emitEvent(link.value)", v-if="link.type === 'router-link'").cursor-pointer
             fa(:icon="defaultIcon", v-show="showParentIcon.parentShow")
             | {{ text }}
 
@@ -95,6 +95,7 @@
 
 <script>
   import draggable from 'vuedraggable'
+  import eventBus from "./eventBus.js"
   export default {
     name: 'Branch',
     props: {
@@ -229,6 +230,9 @@
       },
       checkLast (i) {
         return (i + 1) === this.nodes.length
+      },
+      emitEvent(val){
+          eventBus.$emit("nodeChange", val)
       }
     },
     components: {
