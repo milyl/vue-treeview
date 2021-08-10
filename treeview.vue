@@ -171,8 +171,15 @@ $border: 2px dashed #607d8b
                 &.cancel
                   border: 3px solid #f39c12
                   color: #f39c12
+                  margin-left: 1em
                   &:hover
                     background-color: #f39c12
+
+                &.remove
+                  border: 3px solid red
+                  color: red
+                  &:hover
+                    background-color: red
 
                 &:hover
                   color: white

@@ -18,11 +18,12 @@
               h1 Edit Node
               form(@keyup.enter="save")
                 input(type="text", v-model="text", placeholder="Text: Google")
-                input(type="text", v-model="link.type", placeholder="Type: link")
+                input(type="text", v-model="link.type", hidden, placeholder="Type: link")
                 template(v-show="link.type === 'router-link'")
-                  input(type="text", v-model="link.key", placeholder="Key: path or name")
-                input(type="text", v-model="link.value", placeholder="Value: https://www.google.com")
+                  input(type="text", v-model="link.key", hidden, placeholder="Key: path or name")
+                input(type="text", v-model="link.value", hidden, placeholder="Value: https://www.google.com")
                 .btn-group
+                  button(type="button", @click="remove").remove Delete
                   button(type="button", @click="cancel").cancel Cancel
                   button(type="button", @click="edit").save Edit
       .branch(:class="{ link: (nodes.length > 0) }")
@@ -189,6 +190,10 @@
           this.toggle()
         }
       },
+      remove () {
+          this.creating = false
+          this.editing = false
+      },
       cancel () {
         this.creating = false
         this.editing = false
@@ -219,7 +224,11 @@
             this.creating = false
             this.newNode = {
               text: '',
-              link: {}
+              link: {
+                  type: 'router-link',
+                  key: 'path',
+                  value: '',
+              }
             }
             this.$emit('nodes', this.nodes)
 
