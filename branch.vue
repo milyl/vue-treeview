@@ -6,7 +6,7 @@
           .modal-container
             .modal-content
               h1 Create New Node
-              form(@keyup.enter="save")
+              form(@keyup.enter="save", @submit.prevent)
                 input(type="text", v-model="newNode.text", placeholder="Folder name")
                 .btn-group
                   button(type="button", @click="cancel").cancel Cancel
@@ -23,9 +23,9 @@
                   input(type="text", v-model="link.key", hidden, placeholder="Key: path or name")
                 input(type="text", v-model="link.value", hidden, placeholder="Value: https://www.google.com")
                 .btn-group
-                  button(type="button", @click="remove").remove Delete
-                  button(type="button", @click="cancel").cancel Cancel
-                  button(type="button", @click="edit").save Edit
+                  button(type="button", @click.prevent="remove").remove Delete
+                  button(type="button", @click.prevent="cancel").cancel Cancel
+                  button(type="button", @click.prevent="edit").save Edit
       .branch(:class="{ link: (nodes.length > 0) }")
         template(v-if="nodes.length > 0")
           template(v-if="open")
@@ -155,8 +155,7 @@
         link: {
           type: 'router-link',
           key: 'path',
-          value: '',
-          query: {}
+          value: ''
         }
       },
       creating: false,
@@ -208,16 +207,18 @@
       },
       edit () {
         this.editing = false
+        console.log('link:', this.link.value)
+        const path = this.link.value
+        this.link.value = path.slice(0, path.lastIndexOf('/')) + '/' + this.text
         this.$emit('nodes', this.nodes)
       },
       save () {
           if(this.newNode.text.length){
-              // console.log('nodes',this)
               const query = this.newNode.text.replace(/([a-z])([A-Z])([0-9])/g, "$1-$2").replace(/\s+/g, '-').toLowerCase();
               this.newNode.link = {
                   type: 'router-link',
                   key: 'path',
-                  value: query,
+                  value: this.link.value + '/' + query,
               }
             // console.log('new node:',this.newNode)
             this.nodes.push(this.newNode)
@@ -231,7 +232,6 @@
               }
             }
             this.$emit('nodes', this.nodes)
-
           }
       },
       toggle () {
