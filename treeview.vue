@@ -3,6 +3,7 @@
     treeview(
       v-for="(t, i) in tree",
       :text.sync="t.text",
+      :id.sync="t.id",
       :nodes.sync="t.nodes",
       :type.sync="t.type",
       :link.sync="t.link",
@@ -13,7 +14,8 @@
       :expanded="expanded",
       :draggable="draggable",
       :show-parent-icon="showParentIcon"
-      :key="i"
+      :active-node="activeNode"
+      :key="t.id"
     ).ll931217-vue-treeview
     if editable
         p Double click to create new node
@@ -57,14 +59,20 @@ export default {
         parentShow: false,
         emptyParentShow: false,
       })
+    },
+    activeNode: {
+        type: String,
     }
   },
   components: {
     treeview: branch
   },
   created () {
-      eventBus.$on('nodeChange', (val) => {
+      eventBus.$on('nodeClicked', (val) => {
           this.$emit('change', val)
+      })
+      eventBus.$on('nodeChange', (val) => {
+          this.$emit('nodeChange', val)
       })
   }
 }

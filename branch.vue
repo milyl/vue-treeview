@@ -16,7 +16,7 @@
           .modal-container
             .modal-content
               h1 Edit Node
-              form(@keyup.enter="save")
+              form(@keyup.enter="edit")
                 input(type="text", v-model="text", placeholder="Text: Google")
                 input(type="text", v-model="link.type", hidden, placeholder="Type: link")
                 template(v-show="link.type === 'router-link'")
@@ -26,7 +26,7 @@
                   button(type="button", @click.prevent="remove").remove Delete
                   button(type="button", @click.prevent="cancel").cancel Cancel
                   button(type="button", @click.prevent="edit").save Edit
-      .branch(:class="{ link: (nodes.length > 0) }")
+      .branch(:class="{ link: (nodes.length > 0), active: activeNode == id ? 1 : 0 }")
         template(v-if="nodes.length > 0")
           template(v-if="open")
             fa(:icon="opened", @click="createNewNode").minus-square
@@ -34,7 +34,7 @@
             fa(:icon="closed", @click="createNewNode").plus-square
 
         template(v-if="link && link.value")
-          a(@click="emitEvent(link.value)", v-if="link.type === 'router-link'").cursor-pointer
+          a(@click="emitEvent({id: id, value: link.value})", v-if="link.type === 'router-link'").cursor-pointer
             fa(:icon="defaultIcon", v-show="showParentIcon.parentShow")
             | {{ text }}
 
@@ -45,7 +45,7 @@
           .branch-actions(v-if="editable")
             span(@click="creating = true", v-show="editable").create-btn
                 fa(icon="folder-plus")
-            span(@click="editing = true", v-show="editable").edit-btn
+            span(v-if="id != '0'" @click="editing = true", v-show="editable").edit-btn
                 fa(icon="pen")
         template(v-else)
           span(v-if="nodes.length > 0")
@@ -62,6 +62,7 @@
           :nodes.sync="t.nodes",
           :text="t.text",
           :type="t.type",
+          :id="t.id",
           :link="t.link",
           :class="{ open: open, first: i === 0 && !checkLast(i), last: checkLast(i) }",
           v-if="nodes",
@@ -72,7 +73,8 @@
           :expanded.sync="expanded",
           :draggable.sync="draggable",
           :show-parent-icon="showParentIcon"
-          :key="i"
+          :active-node.sync="activeNode"
+          :key="t.id"
         ).node
       template(v-else)
         branch(
@@ -81,7 +83,8 @@
           :text="t.text",
           :type="t.type",
           :link="t.link",
-          :class="{ open: open, first: i === 0 && !checkLast(i), last: checkLast(i) }",
+          :id="t.id",
+          :class="{ open: open, first: i === 0 && !checkLast(i), last: checkLast(i)}",
           v-if="nodes",
           :closed="closed",
           :opened="opened",
@@ -90,7 +93,8 @@
           :expanded.sync="expanded",
           :draggable.sync="draggable",
           :show-parent-icon="showParentIcon"
-          :key="i"
+          :active-node.sync="activeNode"
+          :key="t.id"
         ).node
 </template>
 
@@ -100,6 +104,11 @@
   export default {
     name: 'Branch',
     props: {
+      id: {
+        type: String,
+        required: false,
+        default: () => null
+      },
       text: {
         type: String,
         required: true,
@@ -144,7 +153,11 @@
           parentShow: false,
           emptyParentShow: false,
         })
+      },
+      activeNode: {
+        type: String,
       }
+
     },
     data: () => ({
       open: false,
@@ -156,7 +169,8 @@
           type: 'router-link',
           key: 'path',
           value: ''
-        }
+        },
+        id: "new",
       },
       creating: false,
       editing: false,
@@ -192,6 +206,11 @@
       remove () {
           this.creating = false
           this.editing = false
+          const data = {
+                parent_id: this.id ? this.id : null,
+                action: 'delete'
+          }
+          eventBus.$emit("nodeChange", data)
       },
       cancel () {
         this.creating = false
@@ -202,17 +221,29 @@
             type: 'router-link',
             key: 'path',
             value: ''
-          }
+          },
+          id: "new"
         }
       },
       edit () {
+        const data = {
+            name: this.text,
+            parent_id: this.id ? this.id : null,
+            action: 'edit'
+        }
         this.editing = false
         console.log('link:', this.link.value)
         const path = this.link.value
         this.link.value = path.slice(0, path.lastIndexOf('/')) + '/' + this.text
         this.$emit('nodes', this.nodes)
+        eventBus.$emit("nodeChange", data)
       },
       save () {
+          const data = {
+              name: this.newNode.text,
+              parent_id: this.id ? this.id : null,
+              action: 'create'
+          }
           if(this.newNode.text.length){
               const query = this.newNode.text.replace(/([a-z])([A-Z])([0-9])/g, "$1-$2").replace(/\s+/g, '-').toLowerCase();
               this.newNode.link = {
@@ -220,7 +251,6 @@
                   key: 'path',
                   value: this.link.value + '/' + query,
               }
-            // console.log('new node:',this.newNode)
             this.nodes.push(this.newNode)
             this.creating = false
             this.newNode = {
@@ -229,8 +259,10 @@
                   type: 'router-link',
                   key: 'path',
                   value: '',
-              }
+              },
+              id: "1",
             }
+            eventBus.$emit("nodeChange", data)
             this.$emit('nodes', this.nodes)
           }
       },
@@ -241,7 +273,7 @@
         return (i + 1) === this.nodes.length
       },
       emitEvent(val){
-          eventBus.$emit("nodeChange", val)
+          eventBus.$emit("nodeClicked", val)
       }
     },
     components: {
