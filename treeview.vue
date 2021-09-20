@@ -16,6 +16,8 @@
       :show-parent-icon="showParentIcon"
       :active-node="activeNode"
       :key="t.id"
+      @node-clicked="emit('change',$event)"
+      @node-changed="emit('node-changed',$event)"
     ).ll931217-vue-treeview
     if editable
         p Double click to create new node
@@ -23,7 +25,6 @@
 
 <script>
 import branch from './branch'
-import eventBus from './eventBus'
 
 export default {
   name: 'TreeView',
@@ -67,14 +68,11 @@ export default {
   components: {
     treeview: branch
   },
-  created () {
-      eventBus.$on('nodeClicked', (val) => {
-          this.$emit('change', val)
-      })
-      eventBus.$on('nodeChange', (val) => {
-          this.$emit('nodeChange', val)
-      })
-  }
+  methods: {
+      emit(event, data){
+          this.$emit(event, data)
+      }
+  },
 }
 </script>
 

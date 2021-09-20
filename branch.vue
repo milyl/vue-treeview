@@ -45,7 +45,7 @@
           .branch-actions(v-if="editable")
             span(@click="creating = true", v-show="editable").create-btn
                 fa(icon="folder-plus")
-            span(v-if="id != '0'" @click="editing = true", v-show="editable").edit-btn
+            span(v-if="id != '0'", @click="editing = true", v-show="editable").edit-btn
                 fa(icon="pen")
         template(v-else)
           span(v-if="nodes.length > 0")
@@ -60,7 +60,7 @@
         branch(
           v-for="(t, i) in nodes",
           :nodes.sync="t.nodes",
-          :text="t.text",
+          :text.sync="t.text",
           :type="t.type",
           :id="t.id",
           :link="t.link",
@@ -72,15 +72,15 @@
           :editable="editable",
           :expanded.sync="expanded",
           :draggable.sync="draggable",
-          :show-parent-icon="showParentIcon"
-          :active-node.sync="activeNode"
+          :show-parent-icon="showParentIcon",
+          :active-node.sync="activeNode",
           :key="t.id"
         ).node
       template(v-else)
         branch(
           v-for="(t, i) in nodes",
           :nodes.sync="t.nodes",
-          :text="t.text",
+          :text.sync="t.text",
           :type="t.type",
           :link="t.link",
           :id="t.id",
@@ -92,15 +92,16 @@
           :editable="editable",
           :expanded.sync="expanded",
           :draggable.sync="draggable",
-          :show-parent-icon="showParentIcon"
-          :active-node.sync="activeNode"
-          :key="t.id"
+          :show-parent-icon="showParentIcon",
+          :active-node.sync="activeNode",
+          :key="t.id",
+          @node-clicked="emit('node-clicked',$event)",
+          @node-changed="emit('node-changed',$event)"
         ).node
 </template>
 
 <script>
   import draggable from 'vuedraggable'
-  import eventBus from "./eventBus.js"
   export default {
     name: 'Branch',
     props: {
@@ -210,7 +211,7 @@
                 parent_id: this.id ? this.id : null,
                 action: 'delete'
           }
-          eventBus.$emit("nodeChange", data)
+          this.$emit("node-changed", data)
       },
       cancel () {
         this.creating = false
@@ -232,11 +233,10 @@
             action: 'edit'
         }
         this.editing = false
-        console.log('link:', this.link.value)
         const path = this.link.value
         this.link.value = path.slice(0, path.lastIndexOf('/')) + '/' + this.text
         this.$emit('nodes', this.nodes)
-        eventBus.$emit("nodeChange", data)
+        this.$emit("node-changed", data)
       },
       save () {
           const data = {
@@ -262,7 +262,7 @@
               },
               id: "1",
             }
-            eventBus.$emit("nodeChange", data)
+            this.$emit("node-changed", data)
             this.$emit('nodes', this.nodes)
           }
       },
@@ -272,8 +272,11 @@
       checkLast (i) {
         return (i + 1) === this.nodes.length
       },
+      emit(event, data){
+          this.$emit(event, data)
+      },
       emitEvent(val){
-          eventBus.$emit("nodeClicked", val)
+          this.$emit("node-clicked", val)
       }
     },
     components: {
