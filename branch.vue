@@ -1,5 +1,5 @@
 <template lang="pug">
-  ul
+  ul.node
     li
       transition(name="modal")
         .modal-mask(v-show="creating", @click.self="cancel")

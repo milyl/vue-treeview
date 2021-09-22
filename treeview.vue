@@ -1,31 +1,57 @@
 <template lang="pug">
   #ll931217-vue-treeview
-    treeview(
-      v-for="(t, i) in tree",
-      :text.sync="t.text",
-      :id.sync="t.id",
-      :nodes.sync="t.nodes",
-      :type.sync="t.type",
-      :link.sync="t.link",
-      :closed="icons.closed",
-      :opened="icons.opened",
-      :defaultIcon="t.icon || icons.default",
-      :editable="editable",
-      :expanded="expanded",
-      :draggable="draggable",
-      :show-parent-icon="showParentIcon"
-      :active-node="activeNode"
-      :key="t.id"
-      @node-clicked="emit('change',$event)"
-      @node-changed="emit('node-changed',$event)"
-    ).ll931217-vue-treeview
-    if editable
-        p Double click to create new node
+    draggable(
+        :list="tree",
+        :group="{ name: 'g1', pull: false, put: true }",
+        :sort="false",
+        v-if="draggable"
+        direction='vertical',
+        draggable=".node"
+    )
+        treeview(
+            v-for="(t, i) in tree",
+            :text.sync="t.text",
+            :id.sync="t.id",
+            :nodes.sync="t.nodes",
+            :type.sync="t.type",
+            :link.sync="t.link",
+            :closed="icons.closed",
+            :opened="icons.opened",
+            :defaultIcon="t.icon || icons.default",
+            :editable="editable",
+            :expanded="expanded",
+            :draggable="draggable",
+            :show-parent-icon="showParentIcon"
+            :active-node="activeNode"
+            :key="t.id"
+            @node-clicked="emit('change',$event)"
+            @node-changed="emit('node-changed',$event)"
+        ).ll931217-vue-treeview
+    template(v-else)
+        treeview(
+            v-for="(t, i) in tree",
+            :text.sync="t.text",
+            :id.sync="t.id",
+            :nodes.sync="t.nodes",
+            :type.sync="t.type",
+            :link.sync="t.link",
+            :closed="icons.closed",
+            :opened="icons.opened",
+            :defaultIcon="t.icon || icons.default",
+            :editable="editable",
+            :expanded="expanded",
+            :draggable="draggable",
+            :show-parent-icon="showParentIcon"
+            :active-node="activeNode"
+            :key="t.id"
+            @node-clicked="emit('change',$event)"
+            @node-changed="emit('node-changed',$event)"
+        ).ll931217-vue-treeview
 </template>
 
 <script>
 import branch from './branch'
-
+import draggable from 'vuedraggable'
 export default {
   name: 'TreeView',
   props: {
@@ -66,7 +92,8 @@ export default {
     }
   },
   components: {
-    treeview: branch
+    treeview: branch,
+    draggable
   },
   methods: {
       emit(event, data){
