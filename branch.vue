@@ -218,7 +218,8 @@
           this.editing = false
           const data = {
                 parent_id: this.id ? this.id : null,
-                action: 'delete'
+                action: 'delete',
+                name: this.text
           }
           this.$emit("node-changed", data)
       },
