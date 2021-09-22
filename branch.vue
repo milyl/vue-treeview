@@ -56,7 +56,14 @@
             fa(:icon="defaultIcon", v-show="showParentIcon.emptyParentShow")
             | {{ text }}
 
-      draggable(:list="nodes", :group="{ name: 'g1' }", v-if="draggable")
+      draggable(
+        :list="nodes",
+        :group="{ name: 'g1', pull: false, put: true }",
+        :sort="false",
+        direction='vertical',
+        v-if="draggable",
+        draggable=".node"
+      )
         branch(
           v-for="(t, i) in nodes",
           :nodes.sync="t.nodes",
@@ -75,6 +82,8 @@
           :show-parent-icon="showParentIcon",
           :active-node.sync="activeNode",
           :key="t.id"
+          @node-clicked="emit('node-clicked',$event)",
+          @node-changed="emit('node-changed',$event)"
         ).node
       template(v-else)
         branch(
